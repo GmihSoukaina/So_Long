@@ -266,3 +266,31 @@ int	main(int ac, char **av)
 		exit(1);
 	exit(0);
 }
+
+
+
+
+
+
+
+
+            // if (!is_open((char *)argv[1] , game))
+            //     print_error("file opening failed\n");
+            // else
+            // {
+            //     lines = count_lines(argv[1]);
+			//     game->map = malloc((lines + 1) * sizeof(char *));
+            //     read_map((char *)argv[1] , game);
+            // } 
+
+
+if (is_open((char *)argv[1] , game))
+            {
+                lines = count_lines(argv[1]);
+                game->map = malloc((lines + 1) * sizeof(char *));
+                if (!game->map)
+				    print_error("Error\nMemory allocation failed for map!\n");
+                read_map((char *)argv[1] , game);
+            }
+            else
+                print_error("file opening failed\n");

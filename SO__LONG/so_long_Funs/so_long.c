@@ -7,43 +7,104 @@ void print_error(char *str)
     exit(1);
 }
 
-int is_open(char *file, t_game *game)
+int is_open(char *filename, t_game *game)
 {
     int fd = 0;
-    game->fd = open(file, O_RDONLY);
+    game->fd = open(filename, O_RDONLY);
     if (fd > 0)
         game->fd = fd;
-    printf("fd = %d\n", game->fd);
     return (game->fd > 0);
 }
 
-// void read_map(char *file, t_game *game)
-// {
-//     char *line;
+int count_lines(char *filename)
+{
+    int lines = 0;
+    char *line;
+    int fd = open(filename, O_RDONLY);
 
-//     game->fd = open(file, O_RDONLY);
-// 	if (game->fd == -1)
-// 		print_error("Error\nfile cannot be opened!\n");
-//     game->i = 0;
-//     line = get_next_line(game->fd);
-//     while (line)
-//     {
-//         if ((ft_strcmp(line, "\n") == 0) || ft_strlen(line) == 0)
-//         {
-//             free(line);
-//             close(game->fd);
-//             print_error("map is invalid\n");
-//         }
-//         game->map[game->i] = ft_strdup(line);
-//         free(line);
-//         if (game->map[game->i][ft_strlen(game->map[game->i]) - 1] == '\n')
-//             game->map[game->i][ft_strlen(game->map[game->i]) - 1] = '\0';
-//         game->i++;
-//         line = get_next_line(game->fd);
-//     }
-//     game->map[game->i] = NULL;
-//     close(game->fd);
-// }
+    if (fd == -1) {
+        print_error("Failed to open map file for counting lines\n");
+        return 0;
+    }
+
+    line = get_next_line(fd);
+    while (line)
+    {
+        lines++;
+        free(line);
+        line = get_next_line(fd);
+    }
+    close(fd);
+    return lines;
+}
+
+
+void read_map(char *filename, t_game *game)
+{
+    char    *line;
+    size_t  len;
+    int     lines;
+
+    game->fd = open(filename, O_RDONLY);
+    if (game->fd == -1) {
+        print_error("Failed to open map file\n");
+        return ;
+    }
+
+    game->i = 0;
+
+    lines = count_lines(filename);
+    printf("lines: %d\n", lines);
+    game->map = malloc((lines + 1) * sizeof(char *));
+    if (!game->map) {
+        print_error("Memory allocation failed\n");
+        close(game->fd);
+        return ;
+    }
+
+    line = get_next_line(game->fd);
+    while (line)
+    {
+        if ((ft_strcmp(line, "\n") == 0) || ft_strlen(line) == 0)
+        {
+            print_error("map is invalid\n");
+            free(line);
+            close(game->fd);
+        }
+
+        // Allocate memory for each line in map
+        game->map[game->i] = ft_strdup(line);
+        if (!game->map[game->i]) {
+            print_error("Memory allocation failed for line\n");
+            free(line);
+            close(game->fd);
+        }
+
+        printf("%s\n", game->map[game->i]);
+
+        len = ft_strlen(game->map[game->i]);
+        if (len > 0 && game->map[game->i][len - 1] == '\n')
+            game->map[game->i][len - 1] = '\0';
+
+        free(line);
+
+        game->i++;
+        line = get_next_line(game->fd);
+    }
+    // Null-terminate the map array
+    game->map[game->i] = NULL;
+    close(game->fd);
+    printf("Map read successfully\n");
+}
+
+int valid_map(t_game *game);
+
+int chech_map(t_game *game, char *filename)
+{
+    if (valid_map(game))
+        print_error("map is invalid\n");
+}
+
 
 int main(int argc, char const *argv[])
 {
@@ -55,14 +116,12 @@ int main(int argc, char const *argv[])
             game = (t_game *)malloc(sizeof(t_game));
             if (!game)
                 print_error("memory allocation failed\n");
-            printf("file name: %s\n", argv[1]);
-
-            // check if file is open
             if (!is_open((char *)argv[1] , game))
                 print_error("file opening failed\n");
             else
-                printf("file opened successfully\n");
-                //read_map((char *)argv[1] , game);
+                read_map((char *)argv[1] , game);
+            check_map(game, argv[1]);
+            //free_map
         }
         else 
             print_error("file must have the extension .ber\n");
