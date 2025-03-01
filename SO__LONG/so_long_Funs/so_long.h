@@ -5,13 +5,15 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
-# include "../Lib/libft/libft.h"
-# include "../Lib/Get/get_next_line.h"
+# include "../lib/libft/libft.h"
+# include "../lib/gnl/get_next_line.h"
 
 typedef struct s_game
 {
-    int i;
-    int j;
+    int     i;
+    int     j;
+    int     fd;
+    char    **map; // Game Map (2D array)
 } t_game;
 
 #endif

@@ -16,10 +16,10 @@ $(NAME): $(OFuns)
 	$(C_Compiler) $(C_FLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OFuns)
+	@$(RM) $(OFuns)
 
 fclean: clean
-	$(RM) $(NAME)
+	@$(RM) $(NAME)
 
 re: fclean all
 
