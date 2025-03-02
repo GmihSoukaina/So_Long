@@ -50,18 +50,14 @@ void read_map(char *filename, t_game *game)
         print_error("Failed to open map file\n");
         return ;
     }
-
     game->i = 0;
-
-    lines = count_lines(filename);
-    printf("lines: %d\n", lines);
+    lines = count_lines(filename); //printf("lines: %d\n", lines);
     game->map = malloc((lines + 1) * sizeof(char *));
     if (!game->map) {
         print_error("Memory allocation failed\n");
         close(game->fd);
         return ;
     }
-
     line = get_next_line(game->fd);
     while (line)
     {
@@ -70,41 +66,31 @@ void read_map(char *filename, t_game *game)
             print_error("map is invalid\n");
             free(line);
             close(game->fd);
-        }
-
-        // Allocate memory for each line in map
+        } // Allocate memory for each line in map
         game->map[game->i] = ft_strdup(line);
         if (!game->map[game->i]) {
             print_error("Memory allocation failed for line\n");
             free(line);
             close(game->fd);
         }
-
-        printf("%s\n", game->map[game->i]);
-
         len = ft_strlen(game->map[game->i]);
         if (len > 0 && game->map[game->i][len - 1] == '\n')
-            game->map[game->i][len - 1] = '\0';
-
+            game->map[game->i][len - 1] = '\0'; //printf("Line : %s\n", game->map[game->i]); // chech if map rectangle
+        if (game->i > 0 && ft_strlen(game->map[game->i]) != ft_strlen(game->map[game->i - 1]))
+        { //printf("Line length : %zu\n", ft_strlen(game->map[game->i])); //printf("Previous line length : %zu\n", ft_strlen(game->map[game->i - 1])); //print_error("map is not a rectangle\n");
+            free(line);
+            close(game->fd);
+        }// check if map is surrounded by walls// check if 01CEP exicte 
         free(line);
-
         game->i++;
         line = get_next_line(game->fd);
     }
     // Null-terminate the map array
     game->map[game->i] = NULL;
+    //printf("map read : %s\n", game->map[game->i]);
     close(game->fd);
     printf("Map read successfully\n");
 }
-
-int valid_map(t_game *game);
-
-int chech_map(t_game *game, char *filename)
-{
-    if (valid_map(game))
-        print_error("map is invalid\n");
-}
-
 
 int main(int argc, char const *argv[])
 {
@@ -120,7 +106,7 @@ int main(int argc, char const *argv[])
                 print_error("file opening failed\n");
             else
                 read_map((char *)argv[1] , game);
-            check_map(game, argv[1]);
+            //check_map(game, (char *)argv[1]);
             //free_map
         }
         else 

@@ -294,3 +294,34 @@ if (is_open((char *)argv[1] , game))
             }
             else
                 print_error("file opening failed\n");
+
+
+
+#include "so_long.h"
+
+void check_walls(t_game *game)
+{
+    int i;
+    int width = ft_strlen(game->map[0]); // Get map width
+    int height = game->win.length;       // Get map height
+
+    // Check first and last row (must be all '1's)
+    for (i = 0; i < width; i++)
+    {
+        if (game->map[0][i] != '1' || game->map[height - 1][i] != '1')
+        {
+            print_error("Error: Map is not surrounded by walls!\n");
+            exit(1);
+        }
+    }
+
+    // Check first and last column (each row must start & end with '1')
+    for (i = 0; i < height; i++)
+    {
+        if (game->map[i][0] != '1' || game->map[i][width - 1] != '1')
+        {
+            print_error("Error: Map is not surrounded by walls!\n");
+            exit(1);
+        }
+    }
+}
