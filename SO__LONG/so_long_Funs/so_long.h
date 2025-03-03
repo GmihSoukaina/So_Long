@@ -14,6 +14,7 @@ typedef struct s_game
     int     j;
     int     fd;
     char    **map; // Game Map (2D array)
+    char    **map2; // Game Map (2D array)
     int	    map_width;    // Map width
 	int	    map_height;   // Map height 
 } t_game;
