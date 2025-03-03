@@ -16,10 +16,10 @@ int is_open(char *filename, t_game *game)
     return (game->fd > 0);
 }
 
-// void    reset_offset(t_game *game)
+// int is_open(char *filename, t_game *game)
 // {
-//     game->fd = open("file name", O_RDONLY);
-//     close (game->fd);
+//     game->fd = open(filename, O_RDONLY);
+//     return (game->fd > 0);
 // }
 
 int count_lines(t_game *game)
@@ -38,7 +38,7 @@ int count_lines(t_game *game)
         line = get_next_line(fd);
     }
     close(fd);
-    return lines;
+    return (lines);
 }
 
 void free_map(char **map, int i)
@@ -75,98 +75,6 @@ void valid_map(t_game *game, char *line)
     }
 }
 
-int is_closed(t_game *game)
-{
-	game->i = 0;
-	game->j = 0;
-
-	while (game->map[game->i][game->j])
-	{
-		if (game->map[game->i][game->j++] != '1')
-			return (0);
-	}
-	game->i = game->map_height - 1;
-	game->j = 0;
-	while (game->map[game->i][game->j])
-	{
-		if (game->map[game->i][game->j++] != '1')
-			return (0);
-	}
-	game->i = 1;
-	game->j = game->map_width - 1;
-	while (game->map[game->i] && game->map[game->i][0] == '1' && game->map[game->i][game->j] == '1')
-		game->i++;
-	if (game->map_height != game->i)
-		return (0);
-	return (1);
-}
-
-// void fill_map(t_game *game, char *line)
-// {
-// 	game->i = 0;
-// 	size_t len;
-
-// 	game->fd = open(line, O_RDONLY);
-// 	len = game->map_width;
-// 	while (len)
-// 	{
-// 		line = get_next_line(game->fd);
-// 		game->map[i] = ft_substr(line, 0, game->map_width);
-// 		game->map2[i] = ft_substr(line, 0, game->map_width);
-// 		i++;
-// 		len--;
-// 	}
-// 	game->map[i] = NULL;
-// 	game->map2[i] = NULL;
-// 	close(game->fd);
-// }
-
-void fill_map(t_game *game, char *line)
-{
-    game->i = 0;
-
-    game->fd = open(line, O_RDONLY);
-    while (game->i < game->map_height)
-    {
-        line = get_next_line(game->fd);
-        if (!line) {
-            print_error("Failed to read line from the map file\n");
-            close(game->fd);
-            return;
-        }
-        game->map2[game->i] = ft_substr(line, 0, game->map_width);
-        if (!game->map2[game->i]) {
-            print_error("Memory allocation failed for map2 line\n");
-            free(line);
-            close(game->fd);
-            return;
-        }
-        free(line);
-        game->i++;
-    }
-    game->map[game->i] = NULL;
-    game->map2[game->i] = NULL;
-    close(game->fd);
-}
-
-
-void check_map(t_game *game, char *line)
-{
-    game->map[game->i] = ft_strdup(line);
-    if (!game->map[game->i])
-    {
-        print_error("Memory allocation failed for line\n");
-        free(line);
-        close(game->fd);
-        free_map(game->map, game->i);
-        exit(1);
-    }
-    valid_map(game, line);
-	fill_map(game, line);
-	// if (!is_closed(game))
-	// 	print_error("The map is not surrounded by walls!");
-}
-
 void empty_line(t_game *game, char *line)
 {
 	if (!line)
@@ -177,37 +85,37 @@ void empty_line(t_game *game, char *line)
         return ;
     }
 }
-void read_map(char *filename, t_game *game)
-{
-    char    *line;
-    int     lines;
 
-    lines = count_lines(game);
-    game->fd = open(filename, O_RDONLY);
-    game->map = malloc((lines + 1) * sizeof(char *));
-    if (!game->map)
-    {
-        print_error("Memory allocation failed\n");
-        close(game->fd);
-        return ;
-    }
-    game->i = 0;
-    line = get_next_line(game->fd);
-	empty_line(game, line);
-    while (line)
-    {
-        check_map(game, line);
-        free(line);
-        game->i++;
-        line = get_next_line(game->fd);
-    }
-    game->map[game->i] = NULL;
-    close(game->fd);
-	printf("map read successfully\n");
-}
+// int is_closed(t_game *game)
+// {
+// 	game->i = 0;
+// 	game->j = 0;
+
+// 	while (game->map[game->i][game->j])
+// 	{
+// 		if (game->map[game->i][game->j++] != '1')
+// 			return (0);
+// 	}
+// 	game->i = game->map_height - 1;
+// 	game->j = 0;
+// 	while (game->map[game->i][game->j])
+// 	{
+// 		if (game->map[game->i][game->j++] != '1')
+// 			return (0);
+// 	}
+// 	game->i = 1;
+// 	game->j = game->map_width - 1;
+// 	while (game->map[game->i] && game->map[game->i][0] == '1' && game->map[game->i][game->j] == '1')
+// 		game->i++;
+// 	if (game->map_height != game->i)
+// 		return (0);
+// 	return (1);
+// }
 
 void print_game(t_game *game)
 {
+	int i;
+    
     printf("Game State:\n");
     printf("i: %d\n", game->i);
     printf("j: %d\n", game->j);
@@ -216,16 +124,92 @@ void print_game(t_game *game)
     printf("Map Width: %d\n", game->map_width);
     printf("Map Height: %d\n", game->map_height);
 
-    // Print the game map (2D array)
-    printf("Map:\n");
-    for (int row = 0; row < game->map_height; row++)
+	i = 0;
+    printf("Game Map (game->map):\n");
+    while (game->map[i] != NULL)
     {
-        for (int col = 0; col < game->map_width; col++)
-        {
-            printf("%c", game->map[row][col]);
-        }
-        printf("\n");
+        printf("%s\n", game->map[i]);
+        i++;
     }
+    i = 0;
+    printf("\nGame Map 2 (game->map2):\n");
+    while (game->map2[i] != NULL)
+    {
+        printf("%s\n", game->map2[i]);
+        i++;
+    }
+}
+
+void fill_map(t_game *game, char *line)
+{
+	size_t	len;
+
+    game->i = 0;
+	len = game->map_height;
+    while (len)
+    {
+        line = get_next_line(game->fd);
+        game->map[game->i] = ft_strdup(line);
+        game->map2[game->i] = ft_strdup(line); 
+        game->i++;
+		len--;
+    }
+    game->map[game->i] = NULL;
+    game->map2[game->i] = NULL;
+	close(game->fd);
+}
+
+void check_map(t_game *game, char *line)
+{
+    game->map[game->i] = ft_strdup(line);
+    game->map2[game->i] = ft_strdup(line);
+    if (!game->map[game->i] || !game->map2[game->i])
+    {
+        print_error("Memory allocation failed for line\n");
+        free(line);
+        close(game->fd);
+        free_map(game->map, game->i);
+        free_map(game->map2, game->i);
+        return ;
+    }
+    valid_map(game, line);
+}
+
+void read_map(char *filename, t_game *game)
+{
+    char    *line;
+    int     lines;
+
+    lines = count_lines(game);
+    game->fd = open(filename, O_RDONLY);
+
+    game->map = malloc((lines + 1) * sizeof(char *));
+	game->map2 = malloc((lines + 1) * sizeof(char *));
+
+    if (!game->map || !game->map2)
+    {
+        print_error("Memory allocation failed\n");
+		free(game->map);
+        free(game->map2);
+        close(game->fd);
+        return ;
+    }
+
+    game->i = 0;
+    line = get_next_line(game->fd);
+	empty_line(game, line);
+
+	while (line)
+    {
+        check_map(game, line);
+        free(line);
+        game->i++;
+        line = get_next_line(game->fd);
+    }
+    game->map[game->i] = NULL;
+    game->map2[game->i] = NULL;
+	game->map_height = game->i;
+    close(game->fd);
 }
 
 void ff()
