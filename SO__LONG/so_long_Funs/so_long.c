@@ -6,45 +6,16 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 12:23:51 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/04 12:30:07 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
-
 int	is_open(char *filename, t_game *game)
 {
 	game->fd = open(filename, O_RDONLY);
 	return (game->fd > 0);
-}
-
-void print_game(t_game *game)
-{
-	int i;
-	
-	printf("Game State:\n");
-	printf("i: %d\n", game->i);
-	printf("j: %d\n", game->j);
-	printf("fd: %d\n", game->fd);
-	//printf("filename: %s\n", game->filename);
-	printf("Map Width: %d\n", game->map_width);
-	printf("Map Height: %d\n", game->map_height);
-
-	i = 0;
-	printf("Game Map (game->map):\n");
-	while (game->map[i] != NULL)
-	{
-		printf("%s\n", game->map[i]);
-		i++;
-	}
-	i = 0;
-	printf("\nGame Map 2 (game->map2):\n");
-	while (game->map2[i] != NULL)
-	{
-		printf("%s\n", game->map2[i]);
-		i++;
-	}
 }
 
 void	read_map(char *filename, t_game *game)
@@ -75,15 +46,38 @@ void	read_map(char *filename, t_game *game)
 	game->map2[game->i] = NULL;
 	close(game->fd);
 }
-
-void ff()
+void print_game(t_game *game)
 {
-	system("leaks so_long");
+	int i;
+	
+	printf("Game State:\n");
+	printf("i: %d\n", game->i);
+	printf("j: %d\n", game->j);
+	printf("fd: %d\n", game->fd);
+	//printf("filename: %s\n", game->filename);
+	printf("Map Width: %d\n", game->map_width);
+	printf("Map Height: %d\n", game->map_height);
+
+	i = 0;
+	printf("Game Map (game->map):\n");
+	while (game->map[i] != NULL)
+	{
+		printf("%s\n", game->map[i]);
+		i++;
+	}
+	i = 0;
+	printf("\nGame Map 2 (game->map2):\n");
+	while (game->map2[i] != NULL)
+	{
+		printf("%s\n", game->map2[i]);
+		i++;
+	}
 }
+
 int	main(int argc, char const *argv[])
 {
-	//atexit(ff);
-	t_game *game;
+	t_game	*game;
+
 	if (argc == 2)
 	{
 		if (ft_strcmp(ft_strrchr(argv[1], '.'), ".ber") == 0)
@@ -91,16 +85,16 @@ int	main(int argc, char const *argv[])
 			game = (t_game *)malloc(sizeof(t_game));
 			if (!game)
 				print_error("memory allocation failed\n");
-			if (!is_open((char *)argv[1] , game))
+			if (!is_open((char *)argv[1], game))
 				print_error("file opening failed\n");
 			else
-				read_map((char *)argv[1] , game);
+				read_map((char *)argv[1], game);
 			if (!is_closed(game))
 				print_error("map is not closed\n");
 			print_game(game);
 			free_game(game);
 		}
-		else 
+		else
 			print_error("file must have the extension .ber\n");
 	}
 	else

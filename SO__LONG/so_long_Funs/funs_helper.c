@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:20:20 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 12:23:34 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/04 12:26:07 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ void	free_game(t_game *game)
 	if (game)
 		free(game);
 }
+
 void	empty_line(t_game *game, char *line)
 {
 	if (!line)

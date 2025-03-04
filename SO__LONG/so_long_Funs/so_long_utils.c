@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   valid_map.c                                        :+:      :+:    :+:   */
+/*   so_long_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:01:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 12:06:37 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/04 12:27:05 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
-int check_walls(t_game *game)
+int	check_walls(t_game *game)
 {
 	game->i = 0;
 	game->j = 0;
@@ -41,7 +41,7 @@ int check_walls(t_game *game)
 	return (1);
 }
 
-int is_closed(t_game *game)
+int	is_closed(t_game *game)
 {
 	game->map_height = 0;
 	while (game->map[game->map_height])
@@ -102,4 +102,3 @@ void	check_map(t_game *game, char *line)
 	}
 	valid_map(game, line);
 }
-
