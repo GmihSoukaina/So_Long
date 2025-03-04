@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 00:27:36 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/04 11:59:11 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,35 +129,18 @@ void print_game(t_game *game)
 	}
 }
 
-// void fill_map(t_game *game, char *line)
-// {
-// 	size_t	len;
-
-//     game->i = 0;
-// 	len = game->map_height;
-//     while (len)
-//     {
-//         line = get_next_line(game->fd);
-//         game->map[game->i] = ft_strdup(line);
-//         game->map2[game->i] = ft_strdup(line);
-//         game->i++;
-// 		len--;
-//     }
-//     game->map[game->i] = NULL;
-//     game->map2[game->i] = NULL;
-// 	close(game->fd);
-// }
-
-int is_closed(t_game *game)
+int check_walls(t_game *game)
 {
+	// Check top wall
 	game->i = 0;
 	game->j = 0;
-
 	while (game->map[game->i][game->j])
 	{
 		if (game->map[game->i][game->j++] != '1')
 			return (0);
 	}
+
+	// Check bottom wall
 	game->i = game->map_height - 1;
 	game->j = 0;
 	while (game->map[game->i][game->j])
@@ -165,6 +148,8 @@ int is_closed(t_game *game)
 		if (game->map[game->i][game->j++] != '1')
 			return (0);
 	}
+
+	// Check left & right walls
 	game->i = 1;
 	game->j = game->map_width - 1;
 	while (game->i < game->map_height)
@@ -173,10 +158,71 @@ int is_closed(t_game *game)
 			return (0);
 		game->i++;
 	}
+	
+	// If the height does not match, the map is not closed
 	if (game->map_height != game->i)
 		return (0);
+
 	return (1);
 }
+
+
+int is_closed(t_game *game)
+{
+	// Calculate map height
+	game->map_height = 0;
+	while (game->map[game->map_height])
+		game->map_height++;
+
+	// Calculate map width using the first row
+	game->map_width = ft_strlen(game->map[0]);
+
+	// Call check_walls to validate wall boundaries
+	if (!check_walls(game))
+	{
+		print_error("map is not closed\n");
+		free_map(game->map, game->map_height);
+		free_map(game->map2, game->map_height);
+		exit(1);
+	}
+
+	return (1);
+}
+
+
+
+// int is_closed(t_game *game)
+// {
+// 	game->map_height = 0;
+// 	while (game->map[game->map_height])
+// 		game->map_height++;
+// 	game->map_width = ft_strlen(game->map[0]);
+// 	game->i = 0;
+// 	game->j = 0;
+// 	while (game->map[game->i][game->j])
+// 	{
+// 		if (game->map[game->i][game->j++] != '1')
+// 			return (0);
+// 	}
+// 	game->i = game->map_height - 1;
+// 	game->j = 0;
+// 	while (game->map[game->i][game->j])
+// 	{
+// 		if (game->map[game->i][game->j++] != '1')
+// 			return (0);
+// 	}
+// 	game->i = 1;
+// 	game->j = game->map_width - 1;
+// 	while (game->i < game->map_height)
+// 	{
+// 		if (game->map[game->i][0] != '1' || game->map[game->i][game->j] != '1')
+// 			return (0);
+// 		game->i++;
+// 	}
+// 	if (game->map_height != game->i)
+// 		return (0);
+// 	return (1);
+// }
 
 
 void	check_map(t_game *game, char *line)
@@ -197,8 +243,6 @@ void	check_map(t_game *game, char *line)
 		return ;
 	}
 	valid_map(game, line);
-	if (!is_closed(game))
-		print_error("map is not closed\n");
 }
 
 void	read_map(char *filename, t_game *game)
@@ -249,6 +293,8 @@ int	main(int argc, char const *argv[])
 				print_error("file opening failed\n");
 			else
 				read_map((char *)argv[1] , game);
+			if (!is_closed(game))
+				print_error("map is not closed\n");
 			print_game(game);
 			free_game(game);
 		}
