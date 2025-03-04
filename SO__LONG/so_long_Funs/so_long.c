@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 11:59:11 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/04 12:18:51 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,43 +64,6 @@ void	free_game(t_game *game)
 		free(game);
 }
 
-void	valid_map(t_game *game, char *line)
-{
-	size_t	len;
-
-	if ((ft_strcmp(line, "\n") == 0) || ft_strlen(line) == 0)
-	{
-		print_error("map is invalid\n");
-		free(line);
-		close(game->fd);
-		free_map(game->map, game->i);
-		return ;
-	}
-	len = ft_strlen(game->map[game->i]);
-	if (len > 0 && game->map[game->i][len - 1] == '\n')
-		game->map[game->i][len - 1] = '\0';
-	if (game->i > 0
-		&& ft_strlen(game->map[game->i]) != ft_strlen(game->map[game->i - 1]))
-	{
-		print_error("map is not a rectangle\n");
-		free(line);
-		close(game->fd);
-		free_map(game->map, game->i);
-		return ;
-	}
-}
-
-void	empty_line(t_game *game, char *line)
-{
-	if (!line)
-	{
-		print_error("map is empty\n");
-		close(game->fd);
-		free_map(game->map, game->i);
-		return ;
-	}
-}
-
 void print_game(t_game *game)
 {
 	int i;
@@ -129,74 +92,46 @@ void print_game(t_game *game)
 	}
 }
 
-int check_walls(t_game *game)
-{
-	// Check top wall
-	game->i = 0;
-	game->j = 0;
-	while (game->map[game->i][game->j])
-	{
-		if (game->map[game->i][game->j++] != '1')
-			return (0);
-	}
-
-	// Check bottom wall
-	game->i = game->map_height - 1;
-	game->j = 0;
-	while (game->map[game->i][game->j])
-	{
-		if (game->map[game->i][game->j++] != '1')
-			return (0);
-	}
-
-	// Check left & right walls
-	game->i = 1;
-	game->j = game->map_width - 1;
-	while (game->i < game->map_height)
-	{
-		if (game->map[game->i][0] != '1' || game->map[game->i][game->j] != '1')
-			return (0);
-		game->i++;
-	}
-	
-	// If the height does not match, the map is not closed
-	if (game->map_height != game->i)
-		return (0);
-
-	return (1);
-}
-
-
-int is_closed(t_game *game)
-{
-	// Calculate map height
-	game->map_height = 0;
-	while (game->map[game->map_height])
-		game->map_height++;
-
-	// Calculate map width using the first row
-	game->map_width = ft_strlen(game->map[0]);
-
-	// Call check_walls to validate wall boundaries
-	if (!check_walls(game))
-	{
-		print_error("map is not closed\n");
-		free_map(game->map, game->map_height);
-		free_map(game->map2, game->map_height);
-		exit(1);
-	}
-
-	return (1);
-}
-
-
-
-// int is_closed(t_game *game)
+// void	valid_map(t_game *game, char *line)
 // {
-// 	game->map_height = 0;
-// 	while (game->map[game->map_height])
-// 		game->map_height++;
-// 	game->map_width = ft_strlen(game->map[0]);
+// 	size_t	len;
+
+// 	if ((ft_strcmp(line, "\n") == 0) || ft_strlen(line) == 0)
+// 	{
+// 		print_error("map is invalid\n");
+// 		free(line);
+// 		close(game->fd);
+// 		free_map(game->map, game->i);
+// 		return ;
+// 	}
+// 	len = ft_strlen(game->map[game->i]);
+// 	if (len > 0 && game->map[game->i][len - 1] == '\n')
+// 		game->map[game->i][len - 1] = '\0';
+// 	if (game->i > 0
+// 		&& ft_strlen(game->map[game->i]) != ft_strlen(game->map[game->i - 1]))
+// 	{
+// 		print_error("map is not a rectangle\n");
+// 		free(line);
+// 		close(game->fd);
+// 		free_map(game->map, game->i);
+// 		return ;
+// 	}
+// }
+
+void	empty_line(t_game *game, char *line)
+{
+	if (!line)
+	{
+		print_error("map is empty\n");
+		close(game->fd);
+		free_map(game->map, game->i);
+		return ;
+	}
+}
+
+// int check_walls(t_game *game)
+// {
+// 	// Check top wall
 // 	game->i = 0;
 // 	game->j = 0;
 // 	while (game->map[game->i][game->j])
@@ -204,6 +139,8 @@ int is_closed(t_game *game)
 // 		if (game->map[game->i][game->j++] != '1')
 // 			return (0);
 // 	}
+
+// 	// Check bottom wall
 // 	game->i = game->map_height - 1;
 // 	game->j = 0;
 // 	while (game->map[game->i][game->j])
@@ -211,6 +148,8 @@ int is_closed(t_game *game)
 // 		if (game->map[game->i][game->j++] != '1')
 // 			return (0);
 // 	}
+
+// 	// Check left & right walls
 // 	game->i = 1;
 // 	game->j = game->map_width - 1;
 // 	while (game->i < game->map_height)
@@ -219,31 +158,56 @@ int is_closed(t_game *game)
 // 			return (0);
 // 		game->i++;
 // 	}
+	
+// 	// If the height does not match, the map is not closed
 // 	if (game->map_height != game->i)
 // 		return (0);
+
 // 	return (1);
 // }
 
 
-void	check_map(t_game *game, char *line)
-{
-	char	*trimmed_line;
+// int is_closed(t_game *game)
+// {
+// 	// Calculate map height
+// 	game->map_height = 0;
+// 	while (game->map[game->map_height])
+// 		game->map_height++;
 
-	trimmed_line = ft_strtrim(line, "\n");
-	game->map[game->i] = ft_strdup(trimmed_line);
-	game->map2[game->i] = ft_strdup(trimmed_line);
-	free(trimmed_line);
-	if (!game->map[game->i] || !game->map2[game->i])
-	{
-		print_error("Memory allocation failed for line\n");
-		free(line);
-		close(game->fd);
-		free_map(game->map, game->i);
-		free_map(game->map2, game->i);
-		return ;
-	}
-	valid_map(game, line);
-}
+// 	// Calculate map width using the first row
+// 	game->map_width = ft_strlen(game->map[0]);
+
+// 	// Call check_walls to validate wall boundaries
+// 	if (!check_walls(game))
+// 	{
+// 		print_error("map is not closed\n");
+// 		free_map(game->map, game->map_height);
+// 		free_map(game->map2, game->map_height);
+// 		exit(1);
+// 	}
+
+// 	return (1);
+// }
+
+// void	check_map(t_game *game, char *line)
+// {
+// 	char	*trimmed_line;
+
+// 	trimmed_line = ft_strtrim(line, "\n");
+// 	game->map[game->i] = ft_strdup(trimmed_line);
+// 	game->map2[game->i] = ft_strdup(trimmed_line);
+// 	free(trimmed_line);
+// 	if (!game->map[game->i] || !game->map2[game->i])
+// 	{
+// 		print_error("Memory allocation failed for line\n");
+// 		free(line);
+// 		close(game->fd);
+// 		free_map(game->map, game->i);
+// 		free_map(game->map2, game->i);
+// 		return ;
+// 	}
+// 	valid_map(game, line);
+// }
 
 void	read_map(char *filename, t_game *game)
 {

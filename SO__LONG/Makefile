@@ -6,6 +6,7 @@ GREEN = \033[0;32m
 RESET = \033[0m
 
 Funs =	so_long_Funs/so_long.c \
+		so_long_Funs/so_long_utils.c \
 		lib/gnl/get_next_line_utils.c \
 		lib/gnl/get_next_line.c
 
