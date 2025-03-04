@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:30:29 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 12:33:00 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/04 13:46:43 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_game
 	char	**map2;
 	int		map_width;
 	int		map_height;
+	int		collectibles;
 }	t_game;
 
 void	read_map(char *filename, t_game *game);

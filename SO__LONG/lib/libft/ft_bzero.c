@@ -1,26 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libft.h                                            :+:      :+:    :+:   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/29 09:40:49 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 13:47:45 by sgmih            ###   ########.fr       */
+/*   Created: 2024/10/28 14:05:18 by sgmih             #+#    #+#             */
+/*   Updated: 2024/11/16 12:57:12 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIBFT_H
-# define LIBFT_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <stdlib.h>
+void	ft_bzero(void *s, size_t n)
+{
+	unsigned char	*ptr;
+	size_t			i;
 
-int		ft_atoi(const char *str);
-int		ft_strcmp(const char *s1, const char *s2);
-char	*ft_strtrim(char const *s1, char const *set);
-char	*ft_strrchr(const char *s, int c);
-char	*ft_strchr(const char *s, int c);
-void	ft_bzero(void *s, size_t n);
-
-#endif
+	i = 0;
+	ptr = (unsigned char *)s;
+	while (i < n)
+	{
+		ptr[i] = 0;
+		i++;
+	}
+}

@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 12:30:07 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/04 14:01:04 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,33 @@ int	is_open(char *filename, t_game *game)
 {
 	game->fd = open(filename, O_RDONLY);
 	return (game->fd > 0);
+}
+
+int	is_valid_rules(t_game *game)
+{
+	int		collec[256];
+
+	ft_bzero(collec, 256);
+	game->i = 1;
+	while (game->map[game->i])
+	{
+		game->j = 1;
+		while (game->map[game->i][game->j])
+		{
+			if (game->map[game->i][game->j] == '0' || game->map[game->i][game->j] == '1'
+					|| game->map[game->i][game->j] == 'C' || game->map[game->i][game->j] == 'E'
+					|| game->map[game->i][game->j] == 'P')
+				collec[(int)game->map[game->i][game->j]] += 1;
+			else
+				return (0);
+			game->j++;
+		}
+		game->i++;
+	}
+	if (collec['C'] == 0 || collec['E'] != 1 || collec['P'] != 1)
+			return (0); 
+	game->collectibles = collec['C'];
+	return (1);
 }
 
 void	read_map(char *filename, t_game *game)
@@ -91,6 +118,8 @@ int	main(int argc, char const *argv[])
 				read_map((char *)argv[1], game);
 			if (!is_closed(game))
 				print_error("map is not closed\n");
+			if (!is_valid_rules(game))
+				print_error("map is not valid 01CEP!");
 			print_game(game);
 			free_game(game);
 		}
