@@ -22,15 +22,15 @@ HEADER = so_long_Funs/so_long.h \
 all: ${NAME}
 
 ${NAME} : ${OFuns} ${LIBFT}
-	${COMPILER} ${CFLAGS} ${OFuns} ${LIBFT} -o ${NAME}
+	@${COMPILER} ${CFLAGS} ${OFuns} ${LIBFT} -o ${NAME}
 	@echo "${GREEN}✅ ${NAME} successfully compiled!${RESET}"
 
 
 so_long_Funs/%.o: so_long_Funs/%.c ${HEADER}
-	${COMPILER} ${CFLAGS} -c $< -o $@
+	@${COMPILER} ${CFLAGS} -c $< -o $@
 
 ${LIBFT}:
-	make -C lib/libft
+	@make -C lib/libft
 
 clean:
 	@${RM} ${OFuns} $(OBJB)
