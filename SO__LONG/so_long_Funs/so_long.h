@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:30:29 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/05 21:15:00 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/06 00:05:13 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ typedef struct s_game
 	int		collectibles;
 	int		player_x;
 	int		player_y;
+	int		exit_x;
+	int		exit_y;
 }	t_game;
 
 void	read_map(char *filename, t_game *game);
@@ -45,4 +47,6 @@ void	free_game(t_game *game);
 void	print_error(char *error);
 int		count_lines(t_game *game);
 int		is_open(char *filename, t_game *game);
+void	flood_fill(t_game *game, int y, int x);
+void	check_collectibles(t_game *game);
 #endif

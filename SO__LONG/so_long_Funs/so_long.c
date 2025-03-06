@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/05 21:22:26 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/06 00:08:44 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,27 @@ void	player_position(t_game *game)
 		game->i++;
 	}
 }
-#include <stdio.h>
+
+void	exit_position(t_game *game)
+{
+    game->i = 1;
+    while (game->map[game->i])
+    {
+        game->j = 1;
+        while (game->map[game->i][game->j])
+        {
+            if (game->map[game->i][game->j] == 'E')
+            {
+                game->exit_x = game->j;
+                game->exit_y = game->i;
+                return ;
+            }
+            game->j++;
+        }
+        game->i++;
+    }
+}
+
 
 void print_game(t_game *game)
 {
@@ -126,6 +146,7 @@ void print_game(t_game *game)
     {
         printf("\nGame Map (game->map) is NULL.\n");
     }
+	flood_fill(game, game->player_y, game->player_x);
     if (game->map2)
     {
         printf("\n===== Game Map 2 (game->map2) =====\n");
@@ -142,7 +163,66 @@ void print_game(t_game *game)
     printf("\n===== End of Game State =====\n");
 }
 
-void parse_game(const char *filename, t_game *game)
+// void flood_fill(t_game *game, int y, int x)
+// {
+// 	if(game->map2[game->player_y][game->player_x] == '1' 
+// 		|| game->map2[game->player_y][game->player_x] == 'E' 
+// 		|| game->map2[game->player_y][game->player_x] == 'X')
+// 		return ;
+// 	if(game->map2[game->player_y][game->player_x] == 'C' 
+// 		|| game->map2[game->player_y][game->player_x] == '0')
+// 	{
+// 		if (game->map2[game->player_y][game->player_x] == 'C')
+//             game->collectibles--;
+// 		game->map2[game->player_y][game->player_x] = 'X';
+// 		// Recursively check all 4 directions
+//         flood_fill(game, y + 1, x); // Down
+//         flood_fill(game, y - 1, x); // Up
+//         flood_fill(game, y, x + 1); // Right
+//         flood_fill(game, y, x - 1); // Left
+// 	}
+// }
+
+void	flood_fill(t_game *game, int y, int x)
+{
+    if (y < 0 || x < 0 || y >= game->map_height || x >= game->map_width)
+        return;
+    if (game->map2[y][x] == '1' || game->map2[y][x] == 'E' || game->map2[y][x] == 'X')
+        return;
+    if (game->map2[y][x] == 'C')
+        game->collectibles--;
+    game->map2[y][x] = 'X';
+    flood_fill(game, y + 1, x);
+    flood_fill(game, y - 1, x);
+    flood_fill(game, y, x + 1);
+    flood_fill(game, y, x - 1);
+}
+
+void	check_collectibles(t_game *game)
+{
+    game->i = 0;
+    while (game->i < game->map_height)
+    {
+        game->j = 0;
+        while (game->j < game->map_width)
+        {
+            if (game->map2[game->i][game->j] == 'C')
+            {
+                printf("Error: Exit at (%d, %d) is unreachable.\n", game->i, game->j);
+                exit(1);
+            }
+            // if (game->map2[game->i][game->j] == 'E')
+            // {
+            //     printf("Error: Exit at (%d, %d) is unreachable.\n", game->i, game->j);
+            //     exit(1);
+            // }
+            game->j++;
+        }
+        game->i++;
+    }
+}
+
+void	parse_game(const char *filename, t_game *game)
 {
     if (!is_open((char *)filename, game))
         print_error("file opening failed\n");
@@ -152,7 +232,11 @@ void parse_game(const char *filename, t_game *game)
     if (!is_valid_rules(game))
         print_error("map is not valid 01CEP!");
     player_position(game);
+	flood_fill(game, game->player_y, game->player_x);
+	exit_position(game);
+	check_collectibles(game);
 }
+
 
 int	main(int argc, char const *argv[])
 {
@@ -165,15 +249,7 @@ int	main(int argc, char const *argv[])
 			game = (t_game *)malloc(sizeof(t_game));
 			if (!game)
 				print_error("memory allocation failed\n");
-			if (!is_open((char *)argv[1], game))
-				print_error("file opening failed\n");
-			else
-				read_map((char *)argv[1], game);
-			if (!is_closed(game))
-				print_error("map is not closed\n");
-			if (!is_valid_rules(game))
-				print_error("map is not valid 01CEP!");
-			player_position(game);
+			parse_game(argv[1], game);
 			print_game(game);
 			free_game(game);
 		}
