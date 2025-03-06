@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/06 14:31:01 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/06 17:30:49 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,7 +251,7 @@ void put_imgs_to_win(void *mlx, void *mlx_win, t_game *game)
 {
     game->i = 0;
     game->j = 0;
-    while (game->map[game->i])
+    while (game->map[game->i]) // Loop over rows of the map
     {
         game->j = 0;
         while (game->map[game->i][game->j])
@@ -259,11 +259,6 @@ void put_imgs_to_win(void *mlx, void *mlx_win, t_game *game)
             if (game->map[game->i][game->j] == '1')
             {
                 load_image(game, "./images/wall.xpm");
-                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
-            }
-            else if (game->map[game->i][game->j] == '0')
-            {
-                load_image(game, "./images/floor.xpm");
                 mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
             }
             else if (game->map[game->i][game->j] == 'C')
@@ -287,6 +282,38 @@ void put_imgs_to_win(void *mlx, void *mlx_win, t_game *game)
     }
 }
 
+void	set_background(t_game *game, char *path)
+{
+	int	img_width = 1200;
+	int	img_height = 1200;
+	void *bg_img;
+	int	x;
+	int	y;
+
+	// Load background image
+	bg_img = mlx_xpm_file_to_image(game->mlxs.mlx, path, &img_width, &img_height);
+	if (!bg_img)
+		print_error("failed to load background image\n");
+
+	// Debugging: Check if the image was loaded correctly
+	printf("Background image loaded: %p\n", bg_img);
+
+	// Fill the entire window with the background image by tiling
+	y = 0;
+	while (y < game->height)  // Use game->height and game->width for window size
+	{
+		x = 0;
+		while (x < game->width)  // Use game->width for window size
+		{
+			mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, bg_img, x, y);
+			x += img_width;  // Move to next tile on the X-axis
+		}
+		y += img_height;  // Move to next tile on the Y-axis
+	}
+}
+
+
+
 int	main(int argc, char const *argv[])
 {
 	t_game	*game;
@@ -302,26 +329,22 @@ int	main(int argc, char const *argv[])
 			print_game(game);
 
             game->mlxs.mlx = mlx_init();
-            
-            //game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, game->map_width * 40, game->map_height * 40, "so_long");
-            game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, 800, 800, "so_long");
+            game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, 1200, 1200, "so_long");
 
+            // Set the window size in the game structure (make sure this matches the window)
+			game->height = 1200; // Set the height
+			game->width = 1200;  // Set the width
 
-            load_image(game, "./images/tanjiro.xpm");
+            set_background(game, "./images/background.xpm");
+
+            // load_image(game, "./images/wall.xpm");
+            // mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->img, 500, 200);
 
 			// Put image on window at (x=0, y=0)
             put_imgs_to_win(game->mlxs.mlx, game->mlxs.mlx_win, game);
-			//mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->img, 0, 0);
-
             mlx_loop(game->mlxs.mlx);
             
 			free_game(game);
-            //mlx init 
-            //mlx creat new window
-            //mlx xpm file to img 
-            //mlx put img to window
-            //mlx loop
-            
 		}
 		else
 			print_error("file must have the extension .ber\n");
