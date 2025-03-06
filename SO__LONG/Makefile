@@ -1,9 +1,11 @@
 COMPILER = cc
-CFLAGS = -Wall -Wextra -Werror 
+CFLAGS = -Wall -Wextra -Werror
 
 RED = \033[0;31m
 GREEN = \033[0;32m
 RESET = \033[0m
+
+MLX = -lmlx -framework OpenGL -framework AppKit
 
 Funs =	so_long_Funs/so_long.c \
 		so_long_Funs/so_long_utils.c \
@@ -24,7 +26,7 @@ HEADER = so_long_Funs/so_long.h \
 all: ${NAME}
 
 ${NAME} : ${OFuns} ${LIBFT}
-	@${COMPILER} ${CFLAGS} ${OFuns} ${LIBFT} -o ${NAME}
+	@${COMPILER} ${CFLAGS} ${OFuns} ${LIBFT} ${MLX} -o ${NAME}
 	@echo "${GREEN}✅ ${NAME} successfully compiled!${RESET}"
 
 

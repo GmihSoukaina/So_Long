@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:30:29 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/06 00:05:13 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/06 13:35:33 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,25 @@
 # define SO_LONG_H
 
 # include <stdio.h>
+# include <mlx.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include "../lib/libft/libft.h"
 # include "../lib/gnl/get_next_line.h"
 
+typedef struct s_mlx
+{
+	void	*mlx;
+	void	*mlx_win;
+}	t_mlx;
+
 typedef struct s_game
 {
+	t_mlx	mlxs;
+	int		width;
+	int		height;
+	void	*img;
 	int		i;
 	int		j;
 	int		fd;

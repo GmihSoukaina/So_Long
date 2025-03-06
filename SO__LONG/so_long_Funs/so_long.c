@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/06 00:08:44 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/06 14:31:01 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,7 @@ void	check_collectibles(t_game *game)
         {
             if (game->map2[game->i][game->j] == 'C')
             {
-                printf("Error: Exit at (%d, %d) is unreachable.\n", game->i, game->j);
+                print_error("map is not valid.\n");
                 exit(1);
             }
             // if (game->map2[game->i][game->j] == 'E')
@@ -237,6 +237,55 @@ void	parse_game(const char *filename, t_game *game)
 	check_collectibles(game);
 }
 
+void	load_image(t_game *game, char *path)
+{
+	int	img_width;
+	int	img_height;
+
+	game->img = mlx_xpm_file_to_image(game->mlxs.mlx, path, &img_width, &img_height);
+	if (!game->img)
+		print_error("failed to load image\n");
+}
+
+void put_imgs_to_win(void *mlx, void *mlx_win, t_game *game)
+{
+    game->i = 0;
+    game->j = 0;
+    while (game->map[game->i])
+    {
+        game->j = 0;
+        while (game->map[game->i][game->j])
+        {
+            if (game->map[game->i][game->j] == '1')
+            {
+                load_image(game, "./images/wall.xpm");
+                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
+            }
+            else if (game->map[game->i][game->j] == '0')
+            {
+                load_image(game, "./images/floor.xpm");
+                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
+            }
+            else if (game->map[game->i][game->j] == 'C')
+            {
+                load_image(game, "./images/collectible.xpm");
+                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
+            }
+            else if (game->map[game->i][game->j] == 'E')
+            {
+                load_image(game, "./images/exit.xpm");
+                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
+            }
+            else if (game->map[game->i][game->j] == 'P')
+            {
+                load_image(game, "./images/player.xpm");
+                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
+            }
+            game->j++;
+        }
+        game->i++;
+    }
+}
 
 int	main(int argc, char const *argv[])
 {
@@ -251,7 +300,28 @@ int	main(int argc, char const *argv[])
 				print_error("memory allocation failed\n");
 			parse_game(argv[1], game);
 			print_game(game);
+
+            game->mlxs.mlx = mlx_init();
+            
+            //game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, game->map_width * 40, game->map_height * 40, "so_long");
+            game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, 800, 800, "so_long");
+
+
+            load_image(game, "./images/tanjiro.xpm");
+
+			// Put image on window at (x=0, y=0)
+            put_imgs_to_win(game->mlxs.mlx, game->mlxs.mlx_win, game);
+			//mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->img, 0, 0);
+
+            mlx_loop(game->mlxs.mlx);
+            
 			free_game(game);
+            //mlx init 
+            //mlx creat new window
+            //mlx xpm file to img 
+            //mlx put img to window
+            //mlx loop
+            
 		}
 		else
 			print_error("file must have the extension .ber\n");
