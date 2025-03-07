@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/06 17:30:49 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/07 11:30:52 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,62 +16,6 @@ int	is_open(char *filename, t_game *game)
 {
 	game->fd = open(filename, O_RDONLY);
 	return (game->fd > 0);
-}
-
-int	is_valid_rules(t_game *game)
-{
-	int		collec[256];
-
-	ft_bzero(collec, 256);
-	game->i = 1;
-	while (game->map[game->i])
-	{
-		game->j = 1;
-		while (game->map[game->i][game->j])
-		{
-			if (game->map[game->i][game->j] == '0' || game->map[game->i][game->j] == '1'
-					|| game->map[game->i][game->j] == 'C' || game->map[game->i][game->j] == 'E'
-					|| game->map[game->i][game->j] == 'P')
-				collec[(int)game->map[game->i][game->j]] += 1;
-			else
-				return (0);
-			game->j++;
-		}
-		game->i++;
-	}
-	if (collec['C'] == 0 || collec['E'] != 1 || collec['P'] != 1)
-			return (0); 
-	game->collectibles = collec['C'];
-	return (1);
-}
-
-void	read_map(char *filename, t_game *game)
-{
-	char	*line;
-	int		lines;
-
-	lines = count_lines(game);
-	game->fd = open(filename, O_RDONLY);
-	game->map = malloc((lines + 1) * sizeof(char *));
-	game->map2 = malloc((lines + 1) * sizeof(char *));
-	if (!game->map || !game->map2)
-	{
-		print_error("Memory allocation failed\n");
-		(free(game->map), free(game->map2), close(game->fd));
-		return ;
-	}
-	game->i = 0;
-	line = get_next_line(game->fd);
-	empty_line(game, line);
-	while (line)
-	{
-		(check_map(game, line), free(line));
-		game->i++;
-		line = get_next_line(game->fd);
-	}
-	game->map[game->i] = NULL;
-	game->map2[game->i] = NULL;
-	close(game->fd);
 }
 
 void	player_position(t_game *game)
@@ -163,65 +107,6 @@ void print_game(t_game *game)
     printf("\n===== End of Game State =====\n");
 }
 
-// void flood_fill(t_game *game, int y, int x)
-// {
-// 	if(game->map2[game->player_y][game->player_x] == '1' 
-// 		|| game->map2[game->player_y][game->player_x] == 'E' 
-// 		|| game->map2[game->player_y][game->player_x] == 'X')
-// 		return ;
-// 	if(game->map2[game->player_y][game->player_x] == 'C' 
-// 		|| game->map2[game->player_y][game->player_x] == '0')
-// 	{
-// 		if (game->map2[game->player_y][game->player_x] == 'C')
-//             game->collectibles--;
-// 		game->map2[game->player_y][game->player_x] = 'X';
-// 		// Recursively check all 4 directions
-//         flood_fill(game, y + 1, x); // Down
-//         flood_fill(game, y - 1, x); // Up
-//         flood_fill(game, y, x + 1); // Right
-//         flood_fill(game, y, x - 1); // Left
-// 	}
-// }
-
-void	flood_fill(t_game *game, int y, int x)
-{
-    if (y < 0 || x < 0 || y >= game->map_height || x >= game->map_width)
-        return;
-    if (game->map2[y][x] == '1' || game->map2[y][x] == 'E' || game->map2[y][x] == 'X')
-        return;
-    if (game->map2[y][x] == 'C')
-        game->collectibles--;
-    game->map2[y][x] = 'X';
-    flood_fill(game, y + 1, x);
-    flood_fill(game, y - 1, x);
-    flood_fill(game, y, x + 1);
-    flood_fill(game, y, x - 1);
-}
-
-void	check_collectibles(t_game *game)
-{
-    game->i = 0;
-    while (game->i < game->map_height)
-    {
-        game->j = 0;
-        while (game->j < game->map_width)
-        {
-            if (game->map2[game->i][game->j] == 'C')
-            {
-                print_error("map is not valid.\n");
-                exit(1);
-            }
-            // if (game->map2[game->i][game->j] == 'E')
-            // {
-            //     printf("Error: Exit at (%d, %d) is unreachable.\n", game->i, game->j);
-            //     exit(1);
-            // }
-            game->j++;
-        }
-        game->i++;
-    }
-}
-
 void	parse_game(const char *filename, t_game *game)
 {
     if (!is_open((char *)filename, game))
@@ -247,11 +132,12 @@ void	load_image(t_game *game, char *path)
 		print_error("failed to load image\n");
 }
 
+
 void put_imgs_to_win(void *mlx, void *mlx_win, t_game *game)
 {
     game->i = 0;
     game->j = 0;
-    while (game->map[game->i]) // Loop over rows of the map
+    while (game->map[game->i])
     {
         game->j = 0;
         while (game->map[game->i][game->j])
@@ -284,35 +170,76 @@ void put_imgs_to_win(void *mlx, void *mlx_win, t_game *game)
 
 void	set_background(t_game *game, char *path)
 {
-	int	img_width = 1200;
-	int	img_height = 1200;
+	game->height = 1200;
+	game->width = 1200;
+	game->img_width = 1200;
+	game->img_height = 1200;
 	void *bg_img;
 	int	x;
 	int	y;
 
-	// Load background image
-	bg_img = mlx_xpm_file_to_image(game->mlxs.mlx, path, &img_width, &img_height);
+	bg_img = mlx_xpm_file_to_image(game->mlxs.mlx, path, &game->img_width, &game->img_height);
 	if (!bg_img)
 		print_error("failed to load background image\n");
-
-	// Debugging: Check if the image was loaded correctly
-	printf("Background image loaded: %p\n", bg_img);
-
-	// Fill the entire window with the background image by tiling
 	y = 0;
-	while (y < game->height)  // Use game->height and game->width for window size
+	while (y < game->height)
 	{
 		x = 0;
-		while (x < game->width)  // Use game->width for window size
+		while (x < game->width)
 		{
 			mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, bg_img, x, y);
-			x += img_width;  // Move to next tile on the X-axis
+			x += game->img_width;
 		}
-		y += img_height;  // Move to next tile on the Y-axis
+		y += game->img_height;
+	}
+}
+int	destroy(t_game *game)
+{
+	free_game(game);
+	mlx_destroy_window(game->mlxs.mlx, game->mlxs.mlx_win);
+	exit(0);
+    return (0);
+}
+
+void	move_player(int i, int j, t_game *game)
+{
+	static size_t	move;
+	char			p;
+
+	p = game->map[game->player_x + i][game->player_y + j];
+	if (p == 'C')
+		game->collectibles--;
+	if ((p != '1' && p != 'E') || (p == 'E' && game->collectibles == 0))
+	{
+		move++;
+		if (p == 'E')
+		{
+			write(1, "ela slamtak, Naaadiii !!!!!\n", 27);
+			destroy(game);
+		}
+		game->map[game->player_y][game->player_x] = '0';
+        game->player_x += i;
+        game->player_y += j;
+        game->map[game->player_y][game->player_x] = 'P';
+		put_imgs_to_win(game->mlxs.mlx, game->mlxs.mlx_win, game);
 	}
 }
 
 
+int key_press(int keycode, t_game *game)
+{
+    if (keycode == 53) // Escape key to quit
+        destroy(game);
+    else if (keycode == 126) // Up arrow key
+        move_player(0, -1, game);
+    else if (keycode == 123) // Left arrow key
+        move_player(-1, 0, game);
+    else if (keycode == 125) // Down arrow key
+        move_player(0, 1, game);
+    else if (keycode == 124) // Right arrow key
+        move_player(1, 0, game);
+    return (0);
+}
 
 int	main(int argc, char const *argv[])
 {
@@ -327,23 +254,16 @@ int	main(int argc, char const *argv[])
 				print_error("memory allocation failed\n");
 			parse_game(argv[1], game);
 			print_game(game);
-
             game->mlxs.mlx = mlx_init();
             game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, 1200, 1200, "so_long");
-
-            // Set the window size in the game structure (make sure this matches the window)
-			game->height = 1200; // Set the height
-			game->width = 1200;  // Set the width
-
             set_background(game, "./images/background.xpm");
-
-            // load_image(game, "./images/wall.xpm");
-            // mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->img, 500, 200);
-
-			// Put image on window at (x=0, y=0)
             put_imgs_to_win(game->mlxs.mlx, game->mlxs.mlx_win, game);
-            mlx_loop(game->mlxs.mlx);
+
+            mlx_key_hook(game->mlxs.mlx_win, key_press, game);
+            mlx_hook(game->mlxs.mlx_win, 17, 0, destroy, game);
+
             
+            mlx_loop(game->mlxs.mlx);
 			free_game(game);
 		}
 		else
