@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 10:36:22 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/08 12:35:27 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/08 14:32:34 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,67 +75,6 @@ void	parse_game(const char *filename, t_game *game)
 }
 
 
-
-void print_game(t_game *game)
-{
-    int i;
-
-    if (!game)
-    {
-        printf("Error: Game structure is NULL.\n");
-        return;
-    }
-
-    // Printing the mlx structure
-    printf("===== MLX State =====\n");
-    if (game->mlxs.mlx && game->mlxs.mlx_win)
-    {
-        printf("MLX: %p\n", game->mlxs.mlx);
-        printf("MLX Window: %p\n", game->mlxs.mlx_win);
-    }
-    else
-    {
-        printf("MLX structure is not initialized.\n");
-    }
-
-    // Printing game state
-    printf("===== Game State =====\n");
-    printf("i: %d\n", game->i);
-    printf("j: %d\n", game->j);
-    printf("fd: %d\n", game->fd);
-    printf("Map Width: %d\n", game->map_width);
-    printf("Map Height: %d\n", game->map_height);
-    printf("Collectibles: %d\n", game->collectibles);
-    printf("Player Position: (%d, %d)\n", game->player_x, game->player_y);
-    printf("Exit Position: (%d, %d)\n", game->exit_x, game->exit_y);
-
-    if (game->map)
-    {
-        printf("\n===== Game Map (game->map) =====\n");
-        for (i = 0; game->map[i] != NULL; i++)
-        {
-            printf("%s\n", game->map[i]);
-        }
-    }
-    else
-    {
-        printf("\nGame Map (game->map) is NULL.\n");
-    }
-    if (game->map2)
-    {
-        printf("\n===== Game Map 2 (game->map2) =====\n");
-        for (i = 0; game->map2[i] != NULL; i++)
-        {
-            printf("%s\n", game->map2[i]);
-        }
-    }
-    else
-    {
-        printf("\nGame Map 2 (game->map2) is NULL.\n");
-    }
-    printf("\n===== End of Game State =====\n");
-}
-
 void	count_collected(t_game	*game)
 {
 	game->i = 0;
@@ -189,11 +128,7 @@ void player_moves(int i, int j, t_game *game)
     char p;
 
     count_collected(game);
-    p = game->map[game->player_x + i][game->player_y + j];
-
-    printf("Current (game->player_x, game->player_y): (%d, %d) -> New (game->player_x + i, game->player_y + j): (%d, %d) | Value: %c\n",
-           game->player_x, game->player_y, game->player_x + i, game->player_y + j, p);
-
+    p = game->map[game->player_y + i][game->player_x + j];
     if (p == 'C')
         game->collectibles--;
     if ((p != '1' && p != 'E') || (p == 'E' && !game->collectibles))
@@ -201,22 +136,14 @@ void player_moves(int i, int j, t_game *game)
         move++;
         game->moves = move;
         printf("Move count: %zu\n", move);
-        printf("Remaining Collectibles: %d\n", game->collectibles); 
-        
-
-        game->map[game->player_x][game->player_y] = '0';
-        game->map[game->player_x + i][game->player_y + j] = 'P';
-
-
-        game->player_x += i;
-        game->player_y += j;
-
-
+        game->map[game->player_y][game->player_x] = '0';
+        game->map[game->player_y + i][game->player_x + j] = 'P';
+        game->player_y += i;
+        game->player_x += j;
         draw_map(game);
-        
         if (p == 'E' && !game->collectibles)
         {
-            write(1, "You Win, Congrats !!!!!\n", 24);
+            write(1, "ela slametak . nadiii !!!\n", 24);
             mlx_map_destroyer(game);
         }
     }
@@ -278,7 +205,7 @@ void xpm_to_img(t_game *game)
     if (!game->player || !game->exit || !game->wall || !game->coin)
     {
         write(2, "Error\nimage name is not compatible!\n", 35);
-        //mlx_map_destroyer(game);
+        mlx_map_destroyer(game);
     }
 }
 void render_map(t_game *game)
@@ -290,13 +217,16 @@ void render_map(t_game *game)
     draw_map(game);
     mlx_hook(game->mlxs.mlx_win, 2, 1L << 0, key_press, game);
     mlx_hook(game->mlxs.mlx_win, 17, 0, close_game, game);
-    //mlx_loop_hook(game->mlxs.mlx, draw_map, game);
     mlx_loop(game->mlxs.mlx);
 }
 
-
+// void ff()
+// {
+//     system("leaks so_long");
+// }
 int	main(int argc, char const *argv[])
 {
+    //atexit(ff);
 	t_game	*game;
 
 	if (argc == 2)
@@ -307,7 +237,6 @@ int	main(int argc, char const *argv[])
 			if (!game)
 				print_error("memory allocation failed\n");
 			parse_game(argv[1], game);
-			print_game(game);
             render_map(game);
 			free_game(game);
 		}
