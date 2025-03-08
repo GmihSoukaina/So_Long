@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/07 16:17:58 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/08 10:35:11 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,79 +145,6 @@ void	set_background(t_game *game, char *path)
 	}
 }
 
-void mlx_map_destroyer(t_game *game)
-{
-    if (game->mlxs.mlx_win) {
-        mlx_destroy_window(game->mlxs.mlx, game->mlxs.mlx_win);
-    }
-    if (game->img) {
-        mlx_destroy_image(game->mlxs.mlx, game->img);
-    }
-    free_map(game->map, game->i);
-	free_map(game->map2, game->j);
-    free(game);
-    exit(0);
-}
-
-int	close_game(t_game *game)
-{
-	if (game)
-	{
-		if (game->map)
-			
-		free(game);
-	}
-	exit(0);
-	return (0);
-}
-void move_up(t_game *game)
-{
-    player_position(game);
-	if (game->map[game->player_x - 1][game->player_y] == '0'
-		|| game->map[game->player_x - 1][game->player_y] == 'C')
-	{
-		if (game->map[game->player_x - 1][game->player_y] == 'C')
-			game->collectibles--;
-            
-		game->moves++;
-		printf("%d", game->moves);
-		write(1, "\n", 1);
-        
-		game->map[game->player_x - 1][game->player_y] = 'P';
-		game->map[game->player_x][game->player_y] = '0';
-	}
-	if (game->map[game->player_x - 1][game->player_y] == 'E'
-		&& game->collectibles == 0)
-	{
-        write(1, "You did it!\n", 13);
-        close_game(game);
-    }
-	game->player = mlx_xpm_file_to_image(game->mlxs.mlx,
-			"textures/player_back.xpm", &game->img_width, &game->img_height);
-}
-
-int key_press(int keycode, t_game *game)
-{
-    if (keycode == 53)
-    {
-        mlx_map_destroyer(game);
-    }
-    else
-    {
-        player_position(game);
-        if (keycode == 126)
-		    move_up(game);
-	    // else if (keycode == 123)
-		//     move_left(game);
-	    // else if (keycode == 125)
-		//     move_down(game);
-	    // else if (keycode == 124)
-		//     move_right(game);
-    }
-    return (0);
-} 
-
-
 
 void print_game(t_game *game)
 {
@@ -298,9 +225,6 @@ int	main(int argc, char const *argv[])
             game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, 1200, 1200, "so_long");
             set_background(game, "./images/background.xpm");
             put_imgs_to_win(game->mlxs.mlx, game->mlxs.mlx_win, game);
-
-            mlx_key_hook(game->mlxs.mlx_win, key_press, game);
-            //mlx_hook(game->mlxs.mlx_win, 17, 0, destroy, game);
 
             
             mlx_loop(game->mlxs.mlx);

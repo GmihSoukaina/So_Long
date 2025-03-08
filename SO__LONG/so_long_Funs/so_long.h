@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:30:29 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/07 16:15:02 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/08 10:51:32 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ typedef struct s_game
 	void	*player;
 	void	*floor;
 	void	*wall;
+	void	*exit;
+	void	*coin;
 	int		moves;
 }	t_game;
 
@@ -69,5 +71,6 @@ void	check_collectibles(t_game *game);
 int	is_valid_rules(t_game *game);
 void mlx_map_destroyer(t_game *game);
 int	close_game(t_game *game);
+void draw_map(t_game *game);
 
 #endif

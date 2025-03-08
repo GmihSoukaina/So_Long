@@ -7,7 +7,7 @@ RESET = \033[0m
 
 MLX = -lmlx -framework OpenGL -framework AppKit
 
-Funs =	so_long_Funs/so_long.c \
+Funs =	so_long_Funs/main.c \
 		so_long_Funs/so_long_utils.c \
 		so_long_Funs/funs_helper.c \
 		so_long_Funs/parsing.c \
