@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 23:22:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/08 10:35:11 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/09 16:43:29 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,16 @@ int	is_open(char *filename, t_game *game)
 
 void	player_position(t_game *game)
 {
-	game->i = 1;
+	game->i = 0;
 	while (game->map[game->i])
 	{
-		game->j = 1;
+		game->j = 0;
 		while (game->map[game->i][game->j])
 		{
 			if (game->map[game->i][game->j] == 'P')
 			{
 				game->player_x = game->j;
 				game->player_y = game->i;
-				return ;
 			}
 			game->j++;
 		}
@@ -75,140 +74,158 @@ void	parse_game(const char *filename, t_game *game)
 	check_collectibles(game);
 }
 
-void	load_image(t_game *game, char *path)
+
+void	count_collected(t_game	*game)
 {
-	int	img_width;
-	int	img_height;
-
-	game->img = mlx_xpm_file_to_image(game->mlxs.mlx, path, &img_width, &img_height);
-	if (!game->img)
-		print_error("failed to load image\n");
-}
-
-void put_imgs_to_win(void *mlx, void *mlx_win, t_game *game)
-{
-    game->i = 0;
-    while (game->map[game->i])
-    {
-        game->j = 0;
-        while (game->map[game->i][game->j])
-        {
-            if (game->map[game->i][game->j] == '1')
-            {
-                load_image(game, "./images/wall.xpm");
-                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
-            }
-            else if (game->map[game->i][game->j] == 'C')
-            {
-                load_image(game, "./images/collectible.xpm");
-                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
-            }
-            else if (game->map[game->i][game->j] == 'E')
-            {
-                load_image(game, "./images/exit.xpm");
-                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
-            }
-            else if (game->map[game->i][game->j] == 'P')
-            {
-                load_image(game, "./images/player.xpm");
-                mlx_put_image_to_window(mlx, mlx_win, game->img, game->j * 40, game->i * 40);
-            }
-            game->j++;
-        }
-        game->i++;
-    }
-}
-
-void	set_background(t_game *game, char *path)
-{
-	game->height = 1200;
-	game->width = 1200;
-	game->img_width = 1200;
-	game->img_height = 1200;
-	void *bg_img;
-	int	x;
-	int	y;
-
-	bg_img = mlx_xpm_file_to_image(game->mlxs.mlx, path, &game->img_width, &game->img_height);
-	if (!bg_img)
-		print_error("failed to load background image\n");
-	y = 0;
-	while (y < game->height)
+	game->i = 0;
+	game->collectibles = 0;
+	while (game->map[game->i])
 	{
-		x = 0;
-		while (x < game->width)
+		game->j = 0;
+		while (game->map[game->i][game->j])
 		{
-			mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, bg_img, x, y);
-			x += game->img_width;
+			if (game->map[game->i][game->j] == 'C')
+				game->collectibles++;
+			game->j++;
 		}
-		y += game->img_height;
+		game->i++;
 	}
 }
 
-
-void print_game(t_game *game)
+void mlx_map_destroyer(t_game *game)
 {
-    int i;
-
-    if (!game)
-    {
-        printf("Error: Game structure is NULL.\n");
-        return;
-    }
-
-    // Printing the mlx structure
-    printf("===== MLX State =====\n");
-    if (game->mlxs.mlx && game->mlxs.mlx_win)
-    {
-        printf("MLX: %p\n", game->mlxs.mlx);
-        printf("MLX Window: %p\n", game->mlxs.mlx_win);
-    }
-    else
-    {
-        printf("MLX structure is not initialized.\n");
-    }
-
-    // Printing game state
-    printf("===== Game State =====\n");
-    printf("i: %d\n", game->i);
-    printf("j: %d\n", game->j);
-    printf("fd: %d\n", game->fd);
-    printf("Map Width: %d\n", game->map_width);
-    printf("Map Height: %d\n", game->map_height);
-    printf("Collectibles: %d\n", game->collectibles);
-    printf("Player Position: (%d, %d)\n", game->player_x, game->player_y);
-    printf("Exit Position: (%d, %d)\n", game->exit_x, game->exit_y);
-
+    if (game->mlxs.mlx_win)
+        mlx_destroy_window(game->mlxs.mlx, game->mlxs.mlx_win);
+    if (game->img)
+        mlx_destroy_image(game->mlxs.mlx, game->img);
     if (game->map)
-    {
-        printf("\n===== Game Map (game->map) =====\n");
-        for (i = 0; game->map[i] != NULL; i++)
-        {
-            printf("%s\n", game->map[i]);
-        }
-    }
-    else
-    {
-        printf("\nGame Map (game->map) is NULL.\n");
-    }
+        free_map(game->map, game->i);
     if (game->map2)
+        free_map(game->map2, game->j);
+    free(game);
+    exit(0);
+}
+
+int close_game(t_game *game)
+{
+    if (game)
     {
-        printf("\n===== Game Map 2 (game->map2) =====\n");
-        for (i = 0; game->map2[i] != NULL; i++)
-        {
-            printf("%s\n", game->map2[i]);
-        }
+        if (game->map)
+            free_map(game->map, game->i);
+        if (game->map2)
+            free_map(game->map2, game->j);
+        free(game);
     }
-    else
-    {
-        printf("\nGame Map 2 (game->map2) is NULL.\n");
-    }
-    printf("\n===== End of Game State =====\n");
+    exit(0);
+    return (0);
 }
 
 
+
+void player_moves(int i, int j, t_game *game)
+{
+    static size_t move;
+    char p;
+
+    count_collected(game);
+    p = game->map[game->player_y + i][game->player_x + j];
+    if (p == 'C')
+        game->collectibles--;
+    if ((p != '1' && p != 'E') || (p == 'E' && !game->collectibles))
+    {
+        move++;
+        game->moves = move;
+        printf("Move count: %zu\n", move);
+        game->map[game->player_y][game->player_x] = '0';
+        game->map[game->player_y + i][game->player_x + j] = 'P';
+        game->player_y += i;
+        game->player_x += j;
+        draw_map(game);
+        if (p == 'E' && !game->collectibles)
+        {
+            write(1, "ela slametak . nadiii !!!\n", 24);
+            mlx_map_destroyer(game);
+        }
+    }
+}
+
+
+int key_press(int keycode, t_game *game)
+{
+    int i = 0; 
+    int j = 0; 
+
+    if (keycode == 53) 
+        mlx_map_destroyer(game);
+    if (keycode == 124)
+        j = 1;
+    else if (keycode == 123)
+        j = -1;
+    else if (keycode == 125)
+        i = 1;
+    else if (keycode == 126)
+        i = -1;
+    
+    if (i != 0 || j != 0)
+        player_moves(i, j, game);
+
+    return (1);
+}
+
+
+void draw_map(t_game *game)
+{
+    mlx_clear_window(game->mlxs.mlx, game->mlxs.mlx_win);
+
+    for (game->i = 0; game->map[game->i]; game->i++)
+    {
+        for (game->j = 0; game->map[game->i][game->j]; game->j++)
+        {
+            if (game->map[game->i][game->j] == 'E')
+                mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->exit, game->j * 40, game->i * 40);
+            else if (game->map[game->i][game->j] == 'P')
+                mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->player, game->j * 40, game->i * 40);
+            else if (game->map[game->i][game->j] == '1')
+                mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->wall, game->j * 40, game->i * 40);
+            else if (game->map[game->i][game->j] == 'C')
+                mlx_put_image_to_window(game->mlxs.mlx, game->mlxs.mlx_win, game->coin, game->j * 40, game->i * 40);
+        }
+    }
+}
+
+
+void xpm_to_img(t_game *game)
+{
+    game->player = mlx_xpm_file_to_image(game->mlxs.mlx, "images/player.xpm", &game->img_width, &game->img_height);
+    game->exit = mlx_xpm_file_to_image(game->mlxs.mlx, "images/exit.xpm", &game->img_width, &game->img_height);
+    game->wall = mlx_xpm_file_to_image(game->mlxs.mlx, "images/wall.xpm", &game->img_width, &game->img_height);
+    game->coin = mlx_xpm_file_to_image(game->mlxs.mlx, "images/collectible.xpm", &game->img_width, &game->img_height);
+
+    if (!game->player || !game->exit || !game->wall || !game->coin)
+    {
+        write(2, "Error\nimage name is not compatible!\n", 35);
+        mlx_map_destroyer(game);
+    }
+}
+void render_map(t_game *game)
+{
+    game->moves = 0;
+    game->mlxs.mlx = mlx_init();
+    game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, 1200, 1200, "so_long");
+    xpm_to_img(game);
+    draw_map(game);
+    mlx_hook(game->mlxs.mlx_win, 2, 1L << 0, key_press, game);
+    mlx_hook(game->mlxs.mlx_win, 17, 0, close_game, game);
+    mlx_loop(game->mlxs.mlx);
+}
+
+// void ff()
+// {
+//     system("leaks so_long");
+// }
 int	main(int argc, char const *argv[])
 {
+    //atexit(ff);
 	t_game	*game;
 
 	if (argc == 2)
@@ -219,15 +236,7 @@ int	main(int argc, char const *argv[])
 			if (!game)
 				print_error("memory allocation failed\n");
 			parse_game(argv[1], game);
-			print_game(game);
-            
-            game->mlxs.mlx = mlx_init();
-            game->mlxs.mlx_win = mlx_new_window(game->mlxs.mlx, 1200, 1200, "so_long");
-            set_background(game, "./images/background.xpm");
-            put_imgs_to_win(game->mlxs.mlx, game->mlxs.mlx_win, game);
-
-            
-            mlx_loop(game->mlxs.mlx);
+            render_map(game);
 			free_game(game);
 		}
 		else
