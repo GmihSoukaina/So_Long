@@ -6,11 +6,17 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:01:47 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/04 12:27:05 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/09 17:38:38 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
+
+int	is_open(char *filename, t_game *game)
+{
+	game->fd = open(filename, O_RDONLY);
+	return (game->fd > 0);
+}
 
 int	check_walls(t_game *game)
 {

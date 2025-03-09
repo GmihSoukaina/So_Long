@@ -11,6 +11,8 @@ Funs =	so_long_Funs/so_long.c \
 		so_long_Funs/so_long_utils.c \
 		so_long_Funs/funs_helper.c \
 		so_long_Funs/parsing.c \
+		so_long_Funs/move_player.c \
+		so_long_Funs/funs_utils.c \
 		lib/gnl/get_next_line_utils.c \
 		lib/gnl/get_next_line.c
 

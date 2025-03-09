@@ -6,7 +6,7 @@
 /*   By: sgmih <sgmih@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 12:30:29 by sgmih             #+#    #+#             */
-/*   Updated: 2025/03/08 10:51:32 by sgmih            ###   ########.fr       */
+/*   Updated: 2025/03/09 18:04:15 by sgmih            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,17 @@ int		count_lines(t_game *game);
 int		is_open(char *filename, t_game *game);
 void	flood_fill(t_game *game, int y, int x);
 void	check_collectibles(t_game *game);
-int	is_valid_rules(t_game *game);
-void mlx_map_destroyer(t_game *game);
-int	close_game(t_game *game);
-void draw_map(t_game *game);
+int		is_valid_rules(t_game *game);
+void	mlx_map_destroyer(t_game *game);
+int		close_game(t_game *game);
+void	draw_map(t_game *game);
+void	player_moves(int i, int j, t_game *game);
+int		key_press(int keycode, t_game *game);
+void	xpm_to_img(t_game *game);
+void	render_map(t_game *game);
+void	count_collected(t_game	*game);
+void	parse_game(const char *filename, t_game *game);
+void	exit_position(t_game *game);
+void	player_position(t_game *game);
 
 #endif
